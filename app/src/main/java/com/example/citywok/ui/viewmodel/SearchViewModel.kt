@@ -13,6 +13,8 @@ import com.google.android.gms.location.LocationServices
 class SearchViewModel : ViewModel() {
 
     var searchRadiusInput by mutableStateOf("")
+    var currentSearchRadius by mutableStateOf(1000)
+        private set
     var currentLocation = mutableStateOf<Location?>(null)
         private set
 
@@ -27,7 +29,7 @@ class SearchViewModel : ViewModel() {
                 currentLocation.value = location
             }
             .addOnFailureListener {
-                    //asetetaan paikaksi oulu jos ei löydy
+                    //asetetaan paikaksi helsinki jos ei löydy
                     currentLocation.value = Location("").apply {
                     latitude = 60.192059
                     longitude = 24.945831
@@ -41,6 +43,10 @@ class SearchViewModel : ViewModel() {
 
     fun getSearchRadius(): Int {
         return searchRadiusInput.toIntOrNull() ?: 0
+    }
+
+    fun changeCurrentSearchRadius(newValue: Int) {
+        currentSearchRadius = newValue
     }
 }
 

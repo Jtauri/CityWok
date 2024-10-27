@@ -15,25 +15,36 @@ sealed interface RestaurantsUIState {
     object Loading : RestaurantsUIState
 }
 
-class RestaurantsViewModel : ViewModel() {
-    var restaurantsUIState: RestaurantsUIState by mutableStateOf<RestaurantsUIState>(RestaurantsUIState.Loading)
+class RestaurantsViewModel(currentLocation: String? = null) : ViewModel() {
+    var restaurantsUIState: RestaurantsUIState by mutableStateOf(RestaurantsUIState.Loading)
         private set
 
     init {
-        getRestaurantsList()
+        val defaultLocation = currentLocation ?: "60.192059,24.945831"
+        getRestaurantsList(1000, defaultLocation)
     }
 
-    private fun getRestaurantsList() {
+    private fun getRestaurantsList(radius: Int, ll: String) {
         viewModelScope.launch {
-            var restaurantsApi: RestaurantsApi? = null
+            restaurantsUIState = RestaurantsUIState.Loading
             try {
-                restaurantsApi = RestaurantsApi.getInstance()
-                val response = restaurantsApi.getRestaurants("60.192059,24.945831", 1000)
-                restaurantsUIState = RestaurantsUIState.Success(response.results)
+                val restaurantsApi = RestaurantsApi.getInstance()
+                val response = restaurantsApi.getRestaurants(ll, radius)
+
+                if (response.results.isEmpty()) {
+                    restaurantsUIState = RestaurantsUIState.Error
+                } else {
+                    restaurantsUIState = RestaurantsUIState.Success(response.results)
+                }
             } catch (e: Exception) {
-                Log.d("VIEWMODEL", e.message.toString())
+                Log.e("VIEWMODEL", "Error fetching restaurants: ${e.message}")
                 restaurantsUIState = RestaurantsUIState.Error
             }
         }
     }
+
+    fun searchRestaurants(radius: Int, ll: String) {
+        getRestaurantsList(radius, ll)
+    }
 }
+

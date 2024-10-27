@@ -14,6 +14,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.text.KeyboardOptions
+import androidx.compose.material3.Button
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.MaterialTheme
@@ -23,6 +24,7 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.input.KeyboardType
@@ -49,60 +51,77 @@ class MainActivity : ComponentActivity() {
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun CityWokApp() {
-    val restaurantsViewModel = RestaurantsViewModel()
-    val searchViewModel = SearchViewModel()
+
+    val searchViewModel: SearchViewModel = viewModel()
+    val currentLocation = searchViewModel.currentLocation.value
+
+    val restaurantsViewModel = remember(currentLocation) {
+        RestaurantsViewModel(currentLocation = "${currentLocation?.latitude},${currentLocation?.longitude}")
+    }
 
     Scaffold(
         topBar = { TopAppBar(title = { Text("Restaurants") }) }
     ) { innerPadding ->
-        RestaurantScreen(
+        Column(
             modifier = Modifier
                 .fillMaxSize()
-                .padding(innerPadding),
-            uiState = restaurantsViewModel.restaurantsUIState,
-            searchViewModel = searchViewModel
-        )
+                .padding(innerPadding)
+        ) {
+
+            SearchBar(
+                modifier = Modifier.padding(8.dp),
+                searchViewModel = searchViewModel,
+                restaurantsViewModel = restaurantsViewModel
+            )
+
+            RestaurantScreen(
+                modifier = Modifier.fillMaxSize(),
+                uiState = restaurantsViewModel.restaurantsUIState,
+            )
+        }
     }
 }
 
+
+
 @Composable
-fun RestaurantScreen(modifier: Modifier = Modifier,
-                     uiState: RestaurantsUIState,
-                     searchViewModel: SearchViewModel)
-{
+fun RestaurantScreen(
+    modifier: Modifier = Modifier,
+    uiState: RestaurantsUIState,
+) {
     when (uiState) {
         is RestaurantsUIState.Loading -> LoadingScreen(modifier = modifier)
-        is RestaurantsUIState.Success -> RestaurantList(modifier = modifier, restaurants = uiState.restaurants, searchViewModel = searchViewModel)
+        is RestaurantsUIState.Success -> RestaurantList(
+            modifier = modifier,
+            restaurants = uiState.restaurants
+        )
         is RestaurantsUIState.Error -> ErrorScreen(modifier = modifier)
     }
 }
 
+
 @Composable
 fun RestaurantList(
     modifier: Modifier = Modifier,
-    restaurants: List<Restaurants>,
-    searchViewModel: SearchViewModel
+    restaurants: List<Restaurants>
 ) {
     LazyColumn(
         modifier = modifier,
         contentPadding = PaddingValues(8.dp),
     ) {
-        item {
-            SearchBar(modifier = Modifier.padding(8.dp), searchViewModel = searchViewModel)
-        }
         items(restaurants) { restaurant ->
             Text(
-                text = restaurant.name,
+                text = restaurant.name ?: "No name",
                 style = MaterialTheme.typography.titleLarge,
                 modifier = Modifier.padding(8.dp)
             )
             Text(
-                text = restaurant.rating.toString(),
+                text = restaurant.rating.toString() ?: "No rating",
                 style = MaterialTheme.typography.bodyLarge,
                 modifier = Modifier.padding(8.dp)
             )
             Text(
-                text = restaurant.location.address,
+                text = restaurant.location.address ?: "No address",
                 style = MaterialTheme.typography.bodyMedium,
                 modifier = Modifier.padding(8.dp)
             )
@@ -110,6 +129,7 @@ fun RestaurantList(
         }
     }
 }
+
 
 
 @Composable
@@ -121,15 +141,16 @@ fun LoadingScreen(modifier: Modifier = Modifier) {
 }
 
 @Composable
-fun ErrorScreen(modifier: Modifier = Modifier) {
+fun ErrorScreen(modifier: Modifier = Modifier, message: String = "Error") {
     Text(
         modifier = modifier,
-        text = "Error"
+        text = message
     )
 }
 
+
 @Composable
-fun SearchBar(modifier: Modifier = Modifier, searchViewModel: SearchViewModel) {
+fun SearchBar(modifier: Modifier = Modifier, searchViewModel: SearchViewModel, restaurantsViewModel: RestaurantsViewModel) {
 
     val searchRadiusInput = searchViewModel.searchRadiusInput
     val currentLocation = searchViewModel.currentLocation.value
@@ -149,16 +170,26 @@ fun SearchBar(modifier: Modifier = Modifier, searchViewModel: SearchViewModel) {
             modifier = Modifier.padding(8.dp)
         )
         Text(
-            text = "Current search radius: ${searchViewModel.getSearchRadius()} meters",
+            text = "Current search radius: ${searchViewModel.currentSearchRadius} meters",
             style = MaterialTheme.typography.bodyLarge,
             modifier = Modifier.padding(8.dp)
         )
-        LocationPermissionHandler(searchViewModel = searchViewModel)
+        Button(
+            onClick = {
+                val radius = searchViewModel.getSearchRadius() ?: 0
+                searchViewModel.changeCurrentSearchRadius(radius)
+                restaurantsViewModel.searchRestaurants(radius, "${currentLocation?.latitude},${currentLocation?.longitude}")
+            },
+            modifier = Modifier.padding(8.dp)
+        ) {
+            Text(text = "Search Restaurants")
+        }
+        GetLocation(searchViewModel = searchViewModel)
     }
 }
 
 @Composable
-fun LocationPermissionHandler(searchViewModel: SearchViewModel = viewModel()) {
+fun GetLocation(searchViewModel: SearchViewModel = viewModel()) {
     val context = LocalContext.current
 
 
