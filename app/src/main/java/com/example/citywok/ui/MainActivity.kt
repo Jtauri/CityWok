@@ -113,17 +113,17 @@ fun RestaurantList(
     ) {
         items(restaurants) { restaurant ->
             Text(
-                text = restaurant.name ?: "No name",
+                text = restaurant.name ?: stringResource(R.string.no_name),
                 style = MaterialTheme.typography.titleLarge,
                 modifier = Modifier.padding(8.dp)
             )
             Text(
-                text = restaurant.rating.toString() ?: "No rating",
+                text = restaurant.rating.toString() ?: stringResource(R.string.no_rating),
                 style = MaterialTheme.typography.bodyLarge,
                 modifier = Modifier.padding(8.dp)
             )
             Text(
-                text = restaurant.location.address ?: "No address",
+                text = restaurant.location.address ?: stringResource(R.string.no_address),
                 style = MaterialTheme.typography.bodyMedium,
                 modifier = Modifier.padding(8.dp)
             )
@@ -138,12 +138,12 @@ fun RestaurantList(
 fun LoadingScreen(modifier: Modifier = Modifier) {
     Text(
         modifier = modifier,
-        text = "Loading..."
+        text = stringResource(R.string.loading)
     )
 }
 
 @Composable
-fun ErrorScreen(modifier: Modifier = Modifier, message: String = "Error") {
+fun ErrorScreen(modifier: Modifier = Modifier, message: String = stringResource(R.string.error)) {
     Text(
         modifier = modifier,
         text = message
@@ -159,14 +159,14 @@ fun SearchBar(modifier: Modifier = Modifier, searchViewModel: SearchViewModel, r
 
     Column(modifier = modifier) {
         Text(
-            text = "Search radius:",
+            text = stringResource(R.string.search_radius),
             style = MaterialTheme.typography.bodyLarge,
             modifier = Modifier.padding(8.dp)
         )
         OutlinedTextField(
             value = searchRadiusInput,
             onValueChange = { searchViewModel.changeSearchRadiusInput(it.replace(",", ".")) },
-            label = { Text("Search radius") },
+            label = { Text(stringResource(R.string.search_radius2)) },
             singleLine = true,
             keyboardOptions = KeyboardOptions.Default.copy(keyboardType = KeyboardType.Number),
             modifier = Modifier.padding(8.dp)
@@ -220,6 +220,10 @@ fun GetLocation(searchViewModel: SearchViewModel = viewModel()) {
 
     val currentLocation = searchViewModel.currentLocation.value
     Text(
-        text = "Current location: ${currentLocation?.latitude ?: "Unknown"}, ${currentLocation?.longitude ?: "Unknown"}"
+        text = stringResource(
+            R.string.current_location,
+            currentLocation?.latitude ?: "Unknown",
+            currentLocation?.longitude ?: "Unknown"
+        )
     )
 }

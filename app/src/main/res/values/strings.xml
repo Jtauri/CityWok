@@ -3,4 +3,12 @@
     <string name="search_restaurants">Search Restaurants</string>
     <string name="current_search_radius_meters">Current search radius: %1$s meters</string>
     <string name="restaurants">Restaurants</string>
+    <string name="loading">Loading...</string>
+    <string name="error">Error</string>
+    <string name="search_radius">Search radius:</string>
+    <string name="search_radius2">Search radius</string>
+    <string name="current_location">Current location: %1$s, %2$s</string>
+    <string name="no_address">No address</string>
+    <string name="no_name">No name</string>
+    <string name="no_rating">No rating</string>
 </resources>
