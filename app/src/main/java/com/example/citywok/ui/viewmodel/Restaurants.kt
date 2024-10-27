@@ -11,6 +11,23 @@ import retrofit2.converter.gson.GsonConverterFactory
 import retrofit2.http.GET
 import retrofit2.http.Query
 
+
+/*
+"results": [
+    { ja täällä alkavat vasta tulokset niin tarvihen samanlaisen dataluokan:
+ */
+data class RestaurantsResponse(
+    val results: List<Restaurants> // Only the list of restaurants
+)
+
+// Updated data class for restaurant information
+data class Restaurants(
+    val fsq_id: String,
+    val name: String,
+    val rating: Double,
+    val location: LocationData
+)
+
 /*
 "location": {
         "address": "string",
@@ -36,34 +53,23 @@ data class LocationData(
     val address: String,
     val postcode: String,
 )
-/*
-"results": [
-    { ja täällä alkavat vasta tulokset niin tarvihen samanlaisen dataluokan:
- */
-data class RestaurantsResponse(
-    val results: List<Restaurants> // Only the list of restaurants
-)
-
-// Updated data class for restaurant information
-data class Restaurants(
-    val fsq_id: String,
-    val name: String,
-    val rating: Double,
-    val location: LocationData
-)
 
 const val BASE_URL = "https://api.foursquare.com/v3/"
 const val API_KEY = ApiKey.API_KEY
-
+/*
+Tämmöinen pittäis tulla:
+https://api.foursquare.com/v3/places/search?ll=60.192059%2C24.945831&radius=1000&categories=13065&limit=10&fields=rating%2Clocation%2Cname%2Cfsq_id&sort=rating
+Authorization: API_AVAIN
+*/
 interface RestaurantsApi {
     @GET("places/search")
     suspend fun getRestaurants(
-        @Query("ll") ll: String,                  // Hakupiste
-        @Query("radius") radius: Int,             // Hakuetäisyys
+        @Query("ll") ll: String, // Hakupiste
+        @Query("radius") radius: Int, // Hakuetäisyys
         @Query("categories") categories: String = "13065",  // Ravintolat
-        @Query("limit") limit: Int = 10,          // Max 10 ravintolaa
-        @Query("fields") fields: String = "rating,location,name,fsq_id",  // Haettavat tiedot
-        @Query("sort") sort: String = "rating"    // Paras ensin
+        @Query("limit") limit: Int = 10, // Max 10 ravintolaa
+        @Query("fields") fields: String = "rating,location,name,fsq_id", // Haettavat tiedot
+        @Query("sort") sort: String = "rating" // Paras ensin
     ): RestaurantsResponse
 
     companion object {
@@ -82,7 +88,7 @@ interface RestaurantsApi {
                 }
 
                 val loggingInterceptor = HttpLoggingInterceptor().apply {
-                    level = HttpLoggingInterceptor.Level.BODY // Apiavaimen ongelmien debuggaamista
+                    level = HttpLoggingInterceptor.Level.BODY // Apiavaimen ongelmien debuggaamista, Bearer oli turha riitti vain Authorization:
                 }
 
                 // OkHttpClient with the API key interceptor
