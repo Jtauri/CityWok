@@ -1,4 +1,4 @@
-package com.example.citywok
+package com.example.citywok.ui
 
 import android.os.Bundle
 import androidx.activity.ComponentActivity
@@ -12,6 +12,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
 import com.example.citywok.ui.theme.CityWokTheme
+import com.example.citywok.ApiKey
 
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -32,8 +33,10 @@ class MainActivity : ComponentActivity() {
 
 @Composable
 fun Greeting(name: String, modifier: Modifier = Modifier) {
+    val obj = ApiKey.API_KEY
     Text(
-        text = "Hello $name!",
+
+        text = "Hello $obj!",
         modifier = modifier
     )
 }
