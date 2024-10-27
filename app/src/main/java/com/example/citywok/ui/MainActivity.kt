@@ -27,9 +27,11 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
+import com.example.citywok.R
 import com.example.citywok.ui.theme.CityWokTheme
 import com.example.citywok.ui.viewmodel.Restaurants
 import com.example.citywok.ui.viewmodel.RestaurantsUIState
@@ -60,7 +62,7 @@ fun CityWokApp() {
     }
 
     Scaffold(
-        topBar = { TopAppBar(title = { Text("Restaurants") }) }
+        topBar = { TopAppBar(title = { Text(stringResource(R.string.restaurants)) }) }
     ) { innerPadding ->
         Column(
             modifier = Modifier
@@ -170,7 +172,10 @@ fun SearchBar(modifier: Modifier = Modifier, searchViewModel: SearchViewModel, r
             modifier = Modifier.padding(8.dp)
         )
         Text(
-            text = "Current search radius: ${searchViewModel.currentSearchRadius} meters",
+            text = stringResource(
+                R.string.current_search_radius_meters,
+                searchViewModel.currentSearchRadius
+            ),
             style = MaterialTheme.typography.bodyLarge,
             modifier = Modifier.padding(8.dp)
         )
@@ -182,7 +187,7 @@ fun SearchBar(modifier: Modifier = Modifier, searchViewModel: SearchViewModel, r
             },
             modifier = Modifier.padding(8.dp)
         ) {
-            Text(text = "Search Restaurants")
+            Text(text = stringResource(R.string.search_restaurants))
         }
         GetLocation(searchViewModel = searchViewModel)
     }
