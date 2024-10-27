@@ -50,6 +50,15 @@ android {
 }
 
 dependencies {
+    //Retrofit ja Gson
+
+    implementation(libs.retrofit)
+    implementation(libs.converter.gson)
+
+    //OkHttp ja interceptors
+    implementation(libs.okhttp)
+    implementation(libs.logging.interceptor)
+
 
     implementation(libs.androidx.core.ktx)
     implementation(libs.androidx.lifecycle.runtime.ktx)
